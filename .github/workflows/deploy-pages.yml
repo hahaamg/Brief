@@ -1,0 +1,59 @@
+name: Deploy 0526 files to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare Pages artifact from 0526 files
+        run: |
+          shopt -s nullglob
+          files=(0526*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No files starting with 0526 found."
+            exit 1
+          fi
+
+          mkdir -p dist
+          cp -r "${files[@]}" dist/
+
+          if [ ! -f dist/index.html ]; then
+            html_files=(dist/0526*.html)
+            if [ ${#html_files[@]} -gt 0 ]; then
+              cp "${html_files[0]}" dist/index.html
+            fi
+          fi
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
