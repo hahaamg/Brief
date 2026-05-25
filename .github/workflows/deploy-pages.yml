@@ -40,6 +40,10 @@ jobs:
           mkdir -p dist/Slide1
           cp -r "${files[@]}" dist/Slide1/
 
+          if [ -f index.html ]; then
+            cp index.html dist/index.html
+          fi
+
           if [ ! -f dist/index.html ]; then
             html_files=(dist/Slide1/*.html)
             if [ ${#html_files[@]} -gt 0 ]; then
