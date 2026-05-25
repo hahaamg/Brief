@@ -1,4 +1,4 @@
-name: Deploy 0526 files to GitHub Pages
+name: Deploy Slide1 files to GitHub Pages
 
 on:
   push:
@@ -23,20 +23,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Prepare Pages artifact from 0526 files
+      - name: Prepare Pages artifact from Slide1 files
         run: |
-          shopt -s nullglob
-          files=(0526*)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No files starting with 0526 found."
+          if [ ! -d Slide1 ]; then
+            echo "Slide1 directory not found."
             exit 1
           fi
 
-          mkdir -p dist
-          cp -r "${files[@]}" dist/
+          shopt -s nullglob
+          files=(Slide1/*)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No files found in Slide1 directory."
+            exit 1
+          fi
+
+          mkdir -p dist/Slide1
+          cp -r "${files[@]}" dist/Slide1/
 
           if [ ! -f dist/index.html ]; then
-            html_files=(dist/0526*.html)
+            html_files=(dist/Slide1/*.html)
             if [ ${#html_files[@]} -gt 0 ]; then
               cp "${html_files[0]}" dist/index.html
             fi
